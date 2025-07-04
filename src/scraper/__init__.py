@@ -2,6 +2,8 @@ from geopy.geocoders import Nominatim
 import requests
 from urllib.parse import quote
 from datetime import datetime
+import os
+import subprocess
 
 class Scraper:
     def __init__(self, location: str, start_date: str = 'JUN/4/2025', end_date: str = 'JUL/4/2025'):
@@ -58,7 +60,7 @@ class Scraper:
 
         return raw_data
 
-    def download_images(self):
+    def get_images(self):
         url = 'https://bhoonidhi.nrsc.gov.in/bhoonidhi/ProductSearch'
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:136.0) Gecko/20100101 Firefox/136.0',
@@ -83,8 +85,26 @@ class Scraper:
         response = requests.post(url, headers=headers, data=raw_data)
 
         if response.status_code == 200:
-            return response.json()
+            return response.json()['Results']
         else:
             print("Error:", response.status_code, response.text)
             return None
 
+    def download_image(self, image_data):
+        base_url = 'http://bhoonidhi.nrsc.gov.in'
+        dir_path = image_data.get('DIRPATH')
+        filename = image_data.get('FILENAME', 'downloaded_image').strip()
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+            "Referer": "https://bhoonidhi.nrsc.gov.in",
+        }
+
+        if not dir_path:
+            print("Missing DIRPATH in image data.")
+            return
+
+        complete_url = f"{base_url}{dir_path}{filename}.jpg"
+        print(f"URL: {complete_url}")
+        output_path = "images/"
+        subprocess.run(["wget", "-P", output_path, complete_url])
