@@ -6,7 +6,7 @@ import os
 import subprocess
 
 class Scraper:
-    def __init__(self, location: str, start_date: str = 'JUN/4/2025', end_date: str = 'JUL/4/2025'):
+    def __init__(self, location: str, start_date: str = 'JUL/4/2020', end_date: str = 'JUL/4/2025'):
         self.location = location
         self.start_date = start_date
         self.end_date = end_date
@@ -105,6 +105,6 @@ class Scraper:
             return
 
         complete_url = f"{base_url}{dir_path}{filename}.jpg"
-        print(f"URL: {complete_url}")
-        output_path = "images/"
-        subprocess.run(["wget", "-P", output_path, complete_url])
+        output_path = f"images/{self.location}/"
+
+        subprocess.run(["wget", "-P", output_path, complete_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
