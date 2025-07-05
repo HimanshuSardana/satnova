@@ -91,7 +91,7 @@ class Scraper:
             return None
 
     def download_image(self, image_data):
-        base_url = 'http://bhoonidhi.nrsc.gov.in'
+        base_url = 'https://bhoonidhi.nrsc.gov.in'
         dir_path = image_data.get('DIRPATH')
         filename = image_data.get('FILENAME', 'downloaded_image').strip()
 
@@ -104,7 +104,21 @@ class Scraper:
             print("Missing DIRPATH in image data.")
             return
 
-        complete_url = f"{base_url}{dir_path}{filename}.jpg"
-        output_path = f"images/{self.location}/"
+        complete_url = f"{base_url}/{dir_path}/{filename}.jpg"
 
-        subprocess.run(["wget", "-P", output_path, complete_url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        output_dir = os.path.join('images', self.location)
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, filename + '.jpg')
+
+        try:
+            subprocess.run([
+                'wget',
+                '--header=User-Agent: Mozilla/5.0',
+                '--header=Referer: https://bhoonidhi.nrsc.gov.in',
+                complete_url,
+                '-O', output_path
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        except subprocess.CalledProcessError as e:
+            pass
+
