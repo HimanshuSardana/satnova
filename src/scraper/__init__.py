@@ -35,7 +35,7 @@ class Scraper:
             "loc": "Decimal",
             "lat": f"{self.latitude:.4f}",
             "lon": f"{self.longitude:.4f}",
-            "radius": "10",
+            "radius": "100",
             "filters": quote("{}")
         }
 
